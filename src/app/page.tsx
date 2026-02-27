@@ -811,7 +811,7 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Telefon kontakt */}
+            {/* Telefon kontakt i lokacija */}
             <div className="flex items-center gap-4">
               <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
                 <a 
@@ -827,6 +827,15 @@ export default function Home() {
                 >
                   <Phone className="h-4 w-4" />
                   <span className="text-sm sm:text-base">064/250-33-04</span>
+                </a>
+                <a 
+                  href="https://www.google.com/maps/dir/?api=1&destination=Ive+Andrica+1+Veternik"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-teal-700 hover:text-teal-900 transition-colors font-medium"
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span className="text-sm sm:text-base hidden sm:inline">Lokacija</span>
                 </a>
               </div>
             </div>
