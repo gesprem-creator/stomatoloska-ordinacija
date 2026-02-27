@@ -232,6 +232,7 @@ export default function Home() {
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
   const [canInstall, setCanInstall] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
 
   const { toast } = useToast();
 
@@ -263,6 +264,10 @@ export default function Home() {
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     setIsIOS(isIOSDevice);
+    // Check if already installed (standalone mode)
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || 
+      (window.navigator as { standalone?: boolean }).standalone === true;
+    setIsStandalone(standalone);
   }, []);
 
   // PWA Install prompt (Android/Chrome)
@@ -289,11 +294,6 @@ export default function Home() {
     }
     setDeferredPrompt(null);
   };
-
-  // Check if already installed (standalone mode)
-  const isStandalone = typeof window !== 'undefined' && 
-    (window.matchMedia('(display-mode: standalone)').matches || 
-     (window.navigator as { standalone?: boolean }).standalone === true);
 
   // Fetch appointments
   const fetchAppointments = useCallback(async () => {
