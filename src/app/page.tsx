@@ -46,6 +46,7 @@ import {
   Search,
   Database,
   Download,
+  Smartphone,
 } from 'lucide-react';
 
 // Zub ikonica (SVG)
@@ -231,6 +232,7 @@ export default function Home() {
   // PWA Install state
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
   const [canInstall, setCanInstall] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
 
   const { toast } = useToast();
 
@@ -258,9 +260,13 @@ export default function Home() {
   // Mounted state for client-side only rendering
   useEffect(() => {
     setMounted(true);
+    // Detect iOS
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    setIsIOS(isIOSDevice);
   }, []);
 
-  // PWA Install prompt
+  // PWA Install prompt (Android/Chrome)
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
@@ -284,6 +290,11 @@ export default function Home() {
     }
     setDeferredPrompt(null);
   };
+
+  // Check if already installed (standalone mode)
+  const isStandalone = typeof window !== 'undefined' && 
+    (window.matchMedia('(display-mode: standalone)').matches || 
+     (window.navigator as { standalone?: boolean }).standalone === true);
 
   // Fetch appointments
   const fetchAppointments = useCallback(async () => {
@@ -1001,8 +1012,8 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            {/* PWA Install dugme */}
-            {mounted && canInstall && (
+            {/* PWA dugme za Android */}
+            {mounted && canInstall && !isStandalone && (
               <Button
                 onClick={handleInstallPWA}
                 className="w-full bg-gradient-to-r from-purple-600 to-teal-600 hover:from-purple-700 hover:to-teal-700 text-white shadow-lg"
@@ -1011,6 +1022,28 @@ export default function Home() {
                 <Download className="h-5 w-5 mr-2" />
                 Instaliraj aplikaciju
               </Button>
+            )}
+
+            {/* Uputstvo za iPhone korisnike */}
+            {mounted && isIOS && !isStandalone && (
+              <Card className="shadow-lg border-0 bg-gradient-to-r from-slate-50 to-slate-100">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-slate-200 rounded-lg shrink-0">
+                      <Smartphone className="h-5 w-5 text-slate-700" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-slate-900">Instaliraj na iPhone</h3>
+                      <ol className="text-sm text-slate-600 space-y-1 list-decimal list-inside">
+                        <li>Otvori u <strong>Safari</strong> browseru</li>
+                        <li>Klikni na <strong>dugme "Podeli"</strong> <span className="inline-block">{'['}</span>⬆️<span className="inline-block">{']'}</span></li>
+                        <li>Odaberi <strong>"Dodaj na početni ekran"</strong></li>
+                        <li>Klikni <strong>"Dodaj"</strong> gore desno</li>
+                      </ol>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </div>
         ) : (
