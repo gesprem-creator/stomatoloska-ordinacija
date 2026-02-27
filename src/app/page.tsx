@@ -172,6 +172,7 @@ function formatPhoneForSerbia(phone: string): string {
 }
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
   const [currentView, setCurrentView] = useState<'booking' | 'admin'>('booking');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [appointmentType, setAppointmentType] = useState<AppointmentType>('popravka');
@@ -254,8 +255,14 @@ export default function Home() {
     checkAuth();
   }, []);
 
+  // Mounted state for client-side only rendering
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // PWA Install prompt
   useEffect(() => {
+    if (!mounted) return;
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -264,7 +271,7 @@ export default function Home() {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-  }, []);
+  }, [mounted]);
 
   const handleInstallPWA = async () => {
     if (!deferredPrompt) return;
@@ -996,7 +1003,7 @@ export default function Home() {
             </Card>
 
             {/* Instalacija aplikacije */}
-            {canInstall && (
+            {mounted && canInstall && (
               <Card className="shadow-lg border-0 bg-gradient-to-r from-purple-50 to-teal-50">
                 <CardContent className="p-4">
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
