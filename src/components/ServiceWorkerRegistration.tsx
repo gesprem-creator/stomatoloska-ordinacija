@@ -1,22 +1,26 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function ServiceWorkerRegistration() {
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    if ('serviceWorker' in navigator && window.location.hostname !== 'localhost') {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(
-          (registration) => {
-            console.log('SW registered:', registration);
-          },
-          (error) => {
-            console.log('SW registration failed:', error);
-          }
-        );
-      });
-    }
+    setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (mounted && 'serviceWorker' in navigator && window.location.hostname !== 'localhost') {
+      navigator.serviceWorker.register('/sw.js').then(
+        (registration) => {
+          console.log('SW registered:', registration);
+        },
+        (error) => {
+          console.log('SW registration failed:', error);
+        }
+      );
+    }
+  }, [mounted]);
 
   return null;
 }
