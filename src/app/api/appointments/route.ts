@@ -85,6 +85,30 @@ export async function POST(request: NextRequest) {
     try {
       // @ts-expect-error - Patient model možda nije dostupan u cache-u
       if (db.patient) {
+        // Pronađi postojećeg pacijenta da proveriš ime
+        // @ts-expect-error - Patient model
+        const existingPatient = await db.patient.findUnique({
+          where: { phone },
+        });
+
+        // Logika: ako postojeće ime ima razmak (ime + prezime), ne menjaj ga
+        // Novo ime koristi samo ako je "bolje" (duže ili ima razmak kad staro nema)
+        const shouldUpdateName = existingPatient 
+          ? (() => {
+              const oldHasSpace = existingPatient.fullName.includes(' ');
+              const newHasSpace = fullName.includes(' ');
+              const oldLen = existingPatient.fullName.length;
+              const newLen = fullName.length;
+              
+              // Ako staro ime nema razmak, a novo ima - ažuriraj
+              if (!oldHasSpace && newHasSpace) return true;
+              // Ako novo ime nema razmak, a staro ima - ne ažuriraj
+              if (oldHasSpace && !newHasSpace) return false;
+              // Ako oba imaju razmak ili oba nemaju - uzmi duže
+              return newLen > oldLen;
+            })()
+          : true; // Nema postojećeg, kreiraj sa novim imenom
+
         // @ts-expect-error - Patient model
         await db.patient.upsert({
           where: { phone },
@@ -96,7 +120,7 @@ export async function POST(request: NextRequest) {
             viberReminder: viberReminder || false,
           },
           update: {
-            fullName,
+            fullName: shouldUpdateName ? fullName : existingPatient?.fullName,
             totalAppointments: { increment: 1 },
             lastVisit: new Date(date),
             viberReminder: viberReminder || false,

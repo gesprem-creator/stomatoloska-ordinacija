@@ -31,6 +31,21 @@ export async function GET(request: NextRequest) {
           if (apt.date > new Date(existing.lastVisit || 0)) {
             existing.lastVisit = apt.date.toISOString();
           }
+          
+          // Logika: ako postojeće ime ima razmak (ime + prezime), ne menjaj ga
+          const oldHasSpace = existing.fullName.includes(' ');
+          const newHasSpace = apt.fullName.includes(' ');
+          const oldLen = existing.fullName.length;
+          const newLen = apt.fullName.length;
+          
+          // Ažuriraj ime samo ako je novo "bolje"
+          if (!oldHasSpace && newHasSpace) {
+            existing.fullName = apt.fullName;
+          } else if (oldHasSpace && !newHasSpace) {
+            // Ne menjaj - staro ima razmak, novo nema
+          } else if (newLen > oldLen) {
+            existing.fullName = apt.fullName;
+          }
         } else {
           patientsMap.set(apt.phone, {
             fullName: apt.fullName,
