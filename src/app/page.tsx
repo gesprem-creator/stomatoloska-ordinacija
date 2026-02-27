@@ -46,7 +46,6 @@ import {
   Search,
   Database,
   Download,
-  Smartphone,
 } from 'lucide-react';
 
 // Zub ikonica (SVG)
@@ -981,7 +980,7 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-purple-100 rounded-xl">
-                      <Smartphone className="h-6 w-6 text-purple-600" />
+                      <Download className="h-6 w-6 text-purple-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-900">Instaliraj aplikaciju</h3>
