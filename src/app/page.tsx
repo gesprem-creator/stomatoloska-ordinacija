@@ -227,6 +227,10 @@ export default function Home() {
   const [loginPassword, setLoginPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
+  // PWA Install state
+  const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
+  const [canInstall, setCanInstall] = useState(false);
+
   const { toast } = useToast();
 
   const today = new Date();
@@ -249,6 +253,31 @@ export default function Home() {
     };
     checkAuth();
   }, []);
+
+  // PWA Install prompt
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setCanInstall(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallPWA = async () => {
+    if (!deferredPrompt) return;
+    // @ts-expect-error - prompt is not in Event type
+    deferredPrompt.prompt();
+    // @ts-expect-error - userChoice is not in Event type
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setCanInstall(false);
+      toast({ title: 'Instalirano!', description: 'Aplikacija je uspešno instalirana' });
+    }
+    setDeferredPrompt(null);
+  };
 
   // Fetch appointments
   const fetchAppointments = useCallback(async () => {
@@ -965,6 +994,32 @@ export default function Home() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Instalacija aplikacije */}
+            {canInstall && (
+              <Card className="shadow-lg border-0 bg-gradient-to-r from-purple-50 to-teal-50">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-purple-100 rounded-xl">
+                        <Download className="h-6 w-6 text-purple-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-slate-900">Instaliraj aplikaciju</h3>
+                        <p className="text-sm text-slate-600">Dodaj na početni ekran za brži pristup</p>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={handleInstallPWA}
+                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Instaliraj
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         ) : (
           /* Admin View */
