@@ -46,7 +46,6 @@ import {
   Search,
   Database,
   Download,
-  Smartphone,
 } from 'lucide-react';
 
 // Zub ikonica (SVG)
@@ -1030,13 +1029,13 @@ export default function Home() {
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <div className="p-2 bg-slate-200 rounded-lg shrink-0">
-                      <Smartphone className="h-5 w-5 text-slate-700" />
+                      <Phone className="h-5 w-5 text-slate-700" />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="font-semibold text-slate-900">Instaliraj na iPhone</h3>
+                      <h3 className="font-semibold text-slate-900">📱 Instaliraj na iPhone</h3>
                       <ol className="text-sm text-slate-600 space-y-1 list-decimal list-inside">
                         <li>Otvori u <strong>Safari</strong> browseru</li>
-                        <li>Klikni na <strong>dugme "Podeli"</strong> <span className="inline-block">{'['}</span>⬆️<span className="inline-block">{']'}</span></li>
+                        <li>Klikni na <strong>dugme "Podeli"</strong> ⬆️</li>
                         <li>Odaberi <strong>"Dodaj na početni ekran"</strong></li>
                         <li>Klikni <strong>"Dodaj"</strong> gore desno</li>
                       </ol>
